@@ -21,22 +21,6 @@ out/
 target/
 gen-external-apklibs/
 classes/
-gradle/
-
-facebook/build
-facebook/gen
-facebook/bin
-facebook/out
-
-dropbox/build
-dropbox/gen
-dropbox/bin
-dropbox/out
-
-ExoPlayer/build
-ExoPlayer/gen
-ExoPlayer/bin
-ExoPlayer/out
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -44,7 +28,6 @@ local.properties
 # Eclipse project files
 .classpath
 .project
-
 
 #idea project files
 *.idea
