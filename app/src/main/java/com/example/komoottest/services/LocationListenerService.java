@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,9 +20,6 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.example.komoottest.App;
 import com.example.komoottest.Constants;
 import com.example.komoottest.R;
@@ -29,6 +27,8 @@ import com.example.komoottest.activities.MainActivity;
 import com.example.komoottest.api.ApiManager;
 import com.example.komoottest.events.RefreshStreamEvent;
 import com.example.komoottest.model.PhotosDto;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,6 +41,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
+ * RHis service will track user location and start loading images when needed
+ *
  * @author <a href="mailto:iBersh20@gmail.com">Iliya Bershadskiy</a>
  * @since 30.03.2015
  */
@@ -133,15 +135,15 @@ public class LocationListenerService extends Service implements LocationListener
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.d(Constants.LOG_TAG, "onLocationChanged()");
         //if we received this update then we walked at least 100 meters. Load image
         apiManager.getImagesForLocation(location.getLatitude(), location.getLongitude(), new Callback<PhotosDto>() {
             @Override
             public void success(PhotosDto photosDto, Response response) {
                 if (photosDto.getPhotos() != null && !photosDto.getPhotos().isEmpty()) {
                     String photoUrl = photosDto.getPhotos().get(0).getPhotoFileUrl();
-                    Glide.with(getApplicationContext())
+                    Picasso.with(getApplicationContext())
                             .load(photoUrl)
-                            .asBitmap()
                             .into(new SaveToSDCardTarget());
                 }
             }
@@ -177,9 +179,12 @@ public class LocationListenerService extends Service implements LocationListener
     }
 
 
-    private static class SaveToSDCardTarget extends SimpleTarget<Bitmap> {
+    /**
+     * Save loaded image to sd card
+     */
+    private static class SaveToSDCardTarget implements Target {
         @Override
-        public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
             File file = new File(App.getNewFileName(Constants.IMAGES_FOLDER));
             try {
                 FileOutputStream fOut = new FileOutputStream(file);
@@ -190,6 +195,16 @@ public class LocationListenerService extends Service implements LocationListener
             } catch (IOException e) {
                 Log.e(Constants.LOG_TAG, e.getMessage(), e);
             }
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Log.e(Constants.LOG_TAG, "Image loading failed");
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
         }
     }
 }

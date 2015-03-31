@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         listView = (ListView) findViewById(R.id.list);
         findViewById(R.id.btn_start_stop).setOnClickListener(new BtnStartStopOnClickListener());
-        adapter = new ImagesStreamAdapter(this, App.getImageFileNames(Constants.IMAGES_FOLDER));
+        adapter = new ImagesStreamAdapter(this, App.getImageFilesPath(Constants.IMAGES_FOLDER));
         listView.setAdapter(adapter);
     }
 
@@ -53,7 +53,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void refreshImageStream() {
         adapter.clear();
-        adapter.addAll(App.getImageFileNames(Constants.IMAGES_FOLDER));
+        adapter.addAll(App.getImageFilesPath(Constants.IMAGES_FOLDER));
     }
 
     public void onEventMainThread(RefreshStreamEvent event) {
@@ -71,6 +71,9 @@ public class MainActivity extends ActionBarActivity {
             Intent intent = new Intent(MainActivity.this, LocationListenerService.class);
             if (isTrackingStarted) {
                 MainActivity.this.stopService(intent);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(Constants.SharedPreferences.SHARED_PREFERENCES_KEY_LOCATION_TRACING_STARTED, false);
+                editor.apply();
             } else {
                 try {
                     FileUtils.cleanDirectory(Constants.IMAGES_FOLDER);
