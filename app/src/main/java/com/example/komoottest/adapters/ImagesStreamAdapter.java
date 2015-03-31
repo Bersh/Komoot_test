@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+
 import com.example.komoottest.R;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.List;
 
 /**

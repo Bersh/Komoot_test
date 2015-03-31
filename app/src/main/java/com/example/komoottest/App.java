@@ -23,6 +23,12 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Get image files list sorted by date. The most recent - first
+     *
+     * @param imagesFolder
+     * @return image files list sorted by date
+     */
     private static List<File> getSortedImageFilesList(File imagesFolder) {
         List<File> files = new ArrayList<>();
         if (imagesFolder.isDirectory()) {
@@ -39,6 +45,12 @@ public class App extends Application {
         return files;
     }
 
+    /**
+     * Get list of absolute path for all images as strings
+     *
+     * @param imagesFolder
+     * @return list of absolute path for all images
+     */
     public static List<String> getImageFilesPath(File imagesFolder) {
         List<String> result = new ArrayList<>();
         List<File> files = getSortedImageFilesList(imagesFolder);
@@ -51,6 +63,12 @@ public class App extends Application {
         return result;
     }
 
+    /**
+     * Get file name for next file
+     *
+     * @param imagesFolder
+     * @return file name for next file
+     */
     public static String getNewFileName(File imagesFolder) {
         String result = "1.png";
         List<File> files = getSortedImageFilesList(imagesFolder);

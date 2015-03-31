@@ -1,7 +1,5 @@
 package com.example.komoottest.api;
 
-import android.content.Context;
-
 import com.example.komoottest.Constants;
 import com.example.komoottest.GeoLocation;
 import com.example.komoottest.model.PhotosDto;
