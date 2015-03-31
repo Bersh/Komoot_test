@@ -13,5 +13,5 @@ import retrofit.http.Query;
  */
 public interface IImages {
     @GET(Constants.Urls.GET_TOP_IMAGE_URL)
-    void getPhotos(@Query("minx") double minX, @Query("miny") double minY, Callback<PhotosDto> callback);
+    void getPhotos(@Query("minx") double minX, @Query("miny") double minY, @Query("maxx") double maxX, @Query("maxy") double maxY, Callback<PhotosDto> callback);
 }

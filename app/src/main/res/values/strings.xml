@@ -3,8 +3,7 @@
 
     <string name="txt_start_stop">Start/Stop</string>
 
-    <string name="provider_gps">Using GPS satellites for location tracking</string>
-    <string name="provider_network">Using Wi-Fi and/or mobile  networks for location tracking</string>
+    <string name="location_tracking_started">Location tracking started</string>
     <string name="provider_unknown">Please enable location tracking sources in settings</string>
     <string name="location_tracking_stopped">Location tracking stopped</string>
     <string name="notification_content">Tracking your location</string>

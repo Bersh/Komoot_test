@@ -3,6 +3,7 @@ package com.example.komoottest.api;
 import android.content.Context;
 
 import com.example.komoottest.Constants;
+import com.example.komoottest.GeoLocation;
 import com.example.komoottest.model.PhotosDto;
 import com.google.gson.GsonBuilder;
 import com.google.gson.LongSerializationPolicy;
@@ -39,6 +40,9 @@ public class ApiManager {
      * @param callback callback
      */
     public void getImagesForLocation(double lat, double lon, Callback<PhotosDto> callback) {
-        imagesAdapter.getPhotos(lat, lon, callback);
+        GeoLocation geoLocation = GeoLocation.fromDegrees(lat, lon);
+        GeoLocation[] geoLocations = geoLocation.boundingCoordinates(1, 6371);
+        imagesAdapter.getPhotos(geoLocations[0].getLatitudeInDegrees(), geoLocations[0].getLongitudeInDegrees(),
+                geoLocations[1].getLatitudeInDegrees(), geoLocations[1].getLongitudeInDegrees(), callback);
     }
 }

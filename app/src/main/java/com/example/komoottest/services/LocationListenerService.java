@@ -86,12 +86,12 @@ public class LocationListenerService extends Service implements LocationListener
         LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         String bestProvider = manager.getBestProvider(criteria, false);
         if(manager.isProviderEnabled(bestProvider)) {
-            manager.requestLocationUpdates(bestProvider, 0, 0, this);
-            Toast.makeText(this, getString(R.string.provider_gps), Toast.LENGTH_SHORT).show(); //todo change text
+            manager.requestLocationUpdates(bestProvider, Constants.LOCATION_MIN_TIME, Constants.LOCATION_MIN_DISTANCE, this);
+            Toast.makeText(this, getString(R.string.location_tracking_started), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, getString(R.string.provider_unknown), Toast.LENGTH_SHORT).show();
         }

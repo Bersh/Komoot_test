@@ -17,9 +17,6 @@ import java.util.List;
  */
 public class App extends Application {
 
-//    public static final String IMAGES_FOLDER_PATH = Environment.getExternalStoragePublicDirectory() + File.separator + "KomootTest";
-//    public static final File IMAGES_FOLDER = new File(Constants.IMAGES_FOLDER_PATH);
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -53,6 +50,6 @@ public class App extends Application {
                 result = ++currentFileNum + ".png";
             }
         }
-        return result;
+        return Constants.IMAGES_FOLDER_PATH + result;
     }
 }

@@ -17,7 +17,6 @@ import com.example.komoottest.services.LocationListenerService;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 
 import de.greenrobot.event.EventBus;
@@ -52,9 +51,13 @@ public class MainActivity extends ActionBarActivity {
         EventBus.getDefault().unregister(this);
     }
 
-    public void onEventMainThread(RefreshStreamEvent event) {
+    private void refreshImageStream() {
         adapter.clear();
         adapter.addAll(App.getImageFileNames(Constants.IMAGES_FOLDER));
+    }
+
+    public void onEventMainThread(RefreshStreamEvent event) {
+        refreshImageStream();
         EventBus.getDefault().removeStickyEvent(RefreshStreamEvent.class);
     }
 
@@ -74,6 +77,7 @@ public class MainActivity extends ActionBarActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                refreshImageStream();
                 MainActivity.this.startService(intent);
             }
         }
