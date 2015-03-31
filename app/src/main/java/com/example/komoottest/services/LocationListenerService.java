@@ -14,6 +14,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -45,12 +46,15 @@ import retrofit.client.Response;
  */
 public class LocationListenerService extends Service implements LocationListener {
     private static final int REQUEST_CODE_SENDER = 0;
+    private PowerManager.WakeLock wakeLock;
     private ApiManager apiManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         apiManager = new ApiManager();
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Tag");
     }
 
     @Override
@@ -62,6 +66,9 @@ public class LocationListenerService extends Service implements LocationListener
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(Constants.SharedPreferences.SHARED_PREFERENCES_KEY_LOCATION_TRACING_STARTED, true);
         editor.apply();
+        if (!wakeLock.isHeld()) {
+            wakeLock.acquire();
+        }
         return START_STICKY;
     }
 
@@ -75,6 +82,9 @@ public class LocationListenerService extends Service implements LocationListener
         editor.putBoolean(Constants.SharedPreferences.SHARED_PREFERENCES_KEY_LOCATION_TRACING_STARTED, false);
         editor.apply();
         Toast.makeText(this, getString(R.string.location_tracking_stopped), Toast.LENGTH_SHORT).show();
+        if (!wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         stopForeground(true);
     }
 
@@ -89,7 +99,7 @@ public class LocationListenerService extends Service implements LocationListener
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         String bestProvider = manager.getBestProvider(criteria, false);
-        if(manager.isProviderEnabled(bestProvider)) {
+        if (manager.isProviderEnabled(bestProvider)) {
             manager.requestLocationUpdates(bestProvider, Constants.LOCATION_MIN_TIME, Constants.LOCATION_MIN_DISTANCE, this);
             Toast.makeText(this, getString(R.string.location_tracking_started), Toast.LENGTH_SHORT).show();
         } else {
@@ -123,7 +133,6 @@ public class LocationListenerService extends Service implements LocationListener
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this, "onLocationChanged", Toast.LENGTH_SHORT).show();
         //if we received this update then we walked at least 100 meters. Load image
         apiManager.getImagesForLocation(location.getLatitude(), location.getLongitude(), new Callback<PhotosDto>() {
             @Override
@@ -133,27 +142,14 @@ public class LocationListenerService extends Service implements LocationListener
                     Glide.with(getApplicationContext())
                             .load(photoUrl)
                             .asBitmap()
-                            .into(new SimpleTarget<Bitmap>(1024, 1024) {
-                                @Override
-                                public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                                    File file = new File(App.getNewFileName(Constants.IMAGES_FOLDER));
-                                    try {
-                                        FileOutputStream fOut = new FileOutputStream(file);
-                                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                                        fOut.flush();
-                                        fOut.close();
-                                        EventBus.getDefault().postSticky(new RefreshStreamEvent());
-                                    } catch (IOException e) {
-                                        Log.e(Constants.LOG_TAG, e.getMessage(), e);
-                                    }
-                                }
-                            });
+                            .into(new SaveToSDCardTarget());
                 }
             }
 
             @Override
             public void failure(RetrofitError error) {
-
+                Log.e(Constants.LOG_TAG, error.getMessage(), error);
+                Toast.makeText(LocationListenerService.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -178,5 +174,22 @@ public class LocationListenerService extends Service implements LocationListener
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+
+    private static class SaveToSDCardTarget extends SimpleTarget<Bitmap> {
+        @Override
+        public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+            File file = new File(App.getNewFileName(Constants.IMAGES_FOLDER));
+            try {
+                FileOutputStream fOut = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                fOut.flush();
+                fOut.close();
+                EventBus.getDefault().postSticky(new RefreshStreamEvent());
+            } catch (IOException e) {
+                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+            }
+        }
     }
 }

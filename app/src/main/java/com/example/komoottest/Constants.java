@@ -16,7 +16,7 @@ public class Constants {
 
     //location tracking
     public static final long LOCATION_MIN_TIME = 1000; //msec
-    public static final float LOCATION_MIN_DISTANCE = 1;//meters
+    public static final float LOCATION_MIN_DISTANCE = 100;//meters
 
     public static final String IMAGES_FOLDER_PATH = Environment.getExternalStorageDirectory() + File.separator + "KomootTest/";
     public static final File IMAGES_FOLDER = new File(Constants.IMAGES_FOLDER_PATH);

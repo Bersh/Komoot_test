@@ -41,7 +41,7 @@ public class ApiManager {
      */
     public void getImagesForLocation(double lat, double lon, Callback<PhotosDto> callback) {
         GeoLocation geoLocation = GeoLocation.fromDegrees(lat, lon);
-        GeoLocation[] geoLocations = geoLocation.boundingCoordinates(1, 6371);
+        GeoLocation[] geoLocations = geoLocation.boundingCoordinates(10, 6371); //target bound radius 10 km. Earth radius 6371 km
         imagesAdapter.getPhotos(geoLocations[0].getLatitudeInDegrees(), geoLocations[0].getLongitudeInDegrees(),
                 geoLocations[1].getLatitudeInDegrees(), geoLocations[1].getLongitudeInDegrees(), callback);
     }

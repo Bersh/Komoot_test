@@ -46,6 +46,7 @@ public class App extends Application {
             }
             if(!files.isEmpty()) {
                 Collections.sort(files, new LastModifiedFileComparator());
+                Collections.reverse(files);
                 int currentFileNum = Integer.parseInt(files.get(0).getName().split("\\.")[0]);
                 result = ++currentFileNum + ".png";
             }
